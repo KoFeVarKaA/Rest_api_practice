@@ -4,8 +4,8 @@ from database import Base
 
 
 
-class UserOrm(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = "user"
 
 
     id : Mapped[int] = mapped_column(primary_key=True)
