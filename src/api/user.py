@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from src.domain.user.repository import UserRepository, User
 from src.domain.user.schema import UserSchema
+# from src.domain.user.repository_test import UserRepository_test
+# UserRepository_test.create_tables()
 
 user_router = APIRouter(
     prefix="/users",
