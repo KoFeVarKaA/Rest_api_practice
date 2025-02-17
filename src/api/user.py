@@ -13,17 +13,17 @@ def get_all(
     repository : Annotated[UserRepository, Depends(UserRepository)]
 ):
     return repository.get_all()
-
+ 
 @user_router.get("/{user_id)}", summary="Получить пользователя по имени из БД")
 def get_by_id(user_id,
               repository : Annotated[UserRepository, Depends(UserRepository)]):
     return repository.get_id(user_id)
     
-
 @user_router.post("", summary="Добавить нового пользователя в БД")
 def create_user(new_user: UserSchema,
                 repository : Annotated[UserRepository, Depends(UserRepository)]):
     repository.insert(User(
+
             first_name=new_user.first_name,
             last_name=new_user.last_name,
             age=new_user.age,
