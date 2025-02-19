@@ -50,6 +50,7 @@ async def create_user(
     ) -> Dict[str, Any]:
     await repository.insert(User(
 
+
             first_name=new_user.first_name,
             last_name=new_user.last_name,
             age=new_user.age,
@@ -62,4 +63,5 @@ async def delete_user(
     repository : Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
     await repository.del_one(int(id))
+
     return {"message": "Пользователь успешно удален"}
