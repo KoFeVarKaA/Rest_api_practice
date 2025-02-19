@@ -9,24 +9,37 @@ user_router = APIRouter(
 )
 
 @user_router.get("/", summary="Получить все пользователей из БД")
-def get_all(
+async def get_all(
     repository : Annotated[UserRepository, Depends(UserRepository)]
 ) -> List[UserSchema]:
-    return repository.get_all()
+    users = await repository.get_all()
+    return [UserSchema(
+                        id=user.id,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        age=user.age,                   
+                ) for user in users]
  
-@user_router.get("/{user_id)}", summary="Получить пользователя по имени из БД")
-def get_by_id(
-    user_id,
+@user_router.get("/{id}", summary="Получить пользователя по имени из БД")
+async def get_by_id(
+    id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
     ) -> UserSchema:
-    return repository.get_id(user_id)
+    user = await repository.get_id(id)
+    return UserSchema(
+                        id=user.id,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        age=user.age,                   
+                    )
     
 @user_router.post("", summary="Добавить нового пользователя в БД")
-def create_user(
+async def create_user(
     new_user: UserSchema,
-    repository : Annotated[UserRepository, Depends(UserRepository)]
+    repository: Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
-    repository.insert(User(
+    await repository.insert(User(
+
 
             first_name=new_user.first_name,
             last_name=new_user.last_name,
@@ -34,10 +47,10 @@ def create_user(
     ))
     return {"message": "Пользователь успешно добавлен"}
 
-@user_router.delete("/{user_id}", summary="Удалить пользователя из БД")
-def delete_user(
-    user_id,
+@user_router.delete("/{id}", summary="Удалить пользователя из БД")
+async def delete_user(
+    id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
-    repository.del_one(user_id)
+    await repository.del_one(id)
     return {"message": "Пользователь успешно удален"}
