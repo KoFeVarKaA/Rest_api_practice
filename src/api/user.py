@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from typing import Annotated, Any, Dict, List
+from fastapi import APIRouter, Depends
 from src.domain.user.repository import UserRepository, User
 from src.domain.user.schema import UserSchema
 
@@ -11,14 +12,6 @@ from src.domain.user.schema import UserSchema
 #                         age=sqlalchemy_model.age
 #                     )
 
-# Функция для преобразования данных из модели SQLAlchemy в модель Pydantic
-def convert_to_pydantic(sqlalchemy_model: User) -> UserSchema:
-    return UserSchema(
-                        id=sqlalchemy_model.id,
-                        first_name=sqlalchemy_model.first_name,
-                        last_name=sqlalchemy_model.last_name,
-                        age=sqlalchemy_model.age
-                    )
 
 user_router = APIRouter(
     prefix="/users",
