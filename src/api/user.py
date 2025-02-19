@@ -32,10 +32,10 @@ async def get_all(
  
 @user_router.get("/{id}", summary="Получить пользователя по имени из БД")
 async def get_by_id(
-    id,
+    id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
     ) -> UserSchema:
-    user = await repository.get_id(int(id))
+    user = await repository.get_id(id)
     return UserSchema(
                         id=user.id,
                         first_name=user.first_name,
@@ -46,7 +46,7 @@ async def get_by_id(
 @user_router.post("", summary="Добавить нового пользователя в БД")
 async def create_user(
     new_user: UserSchema,
-    repository : Annotated[UserRepository, Depends(UserRepository)]
+    repository: Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
     await repository.insert(User(
 
@@ -58,8 +58,8 @@ async def create_user(
 
 @user_router.delete("/{id}", summary="Удалить пользователя из БД")
 async def delete_user(
-    id,
+    id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
-    await repository.del_one(int(id))
+    await repository.del_one(id)
     return {"message": "Пользователь успешно удален"}
