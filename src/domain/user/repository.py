@@ -35,7 +35,7 @@ class UserRepository:
             return users
 
     @staticmethod
-    async def update(user_id : int = 1, new_username : str = "Kostya") -> None:
+    async def update(user_id : int, new_username : str) -> None:
         async with session_factory() as session:
             user = await session.get(User, user_id)
             user.username = new_username
