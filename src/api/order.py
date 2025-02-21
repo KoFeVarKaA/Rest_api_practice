@@ -2,6 +2,7 @@ from typing import Annotated, Any, Dict, List
 from fastapi import APIRouter, Depends
 from src.domain.order.repository import OrderRepository, Order
 from src.domain.order.schema import OrderSchema
+from src.api.schemas import SuccessResponseSchema
 
 order_router = APIRouter(
     prefix="/Orders",
@@ -35,17 +36,17 @@ async def get_by_id(
 async def create_order(
     new_order: OrderSchema,
     repository: Annotated[OrderRepository, Depends(OrderRepository)]
-    ) -> Dict[str, Any]:
+    ) -> SuccessResponseSchema:
     await repository.insert(Order(
             name=new_order.name,
             total_sum=new_order.total_sum,
     ))
-    return {"message": "Заказ успешно добавлен"}
+    return SuccessResponseSchema("Заказ успешно добавлен")
 
 @order_router.delete("/{id}", summary="Удалить заказ из БД")
 async def delete_order(
     id: int,
     repository : Annotated[OrderRepository, Depends(OrderRepository)]
-    ) -> Dict[str, Any]:
+    ) -> SuccessResponseSchema:
     await repository.del_one(id)
-    return {"message": "Заказ успешно удален"}
+    return SuccessResponseSchema("Заказ успешно удален")
