@@ -21,10 +21,37 @@ class UserRepository:
             await session.commit()
 
     @staticmethod
+    async def does_user_exist(user_id) -> bool:
+        async with session_factory() as session:
+            query = (
+                select(User)
+                .filter(User.id == user_id)
+            )
+            res = session.execute(query)
+            result = res.all()
+            if result == []:
+                return False
+            else:
+                return True
+
+    @staticmethod
     async def get_id(user_id : int) -> User: 
         async with session_factory() as session:
             user = await session.get(User, {"id": user_id})
             return user
+    
+    @staticmethod
+    async def get_users_by_ids(user_ids: list[int]) -> list[User]:
+        if not user_ids:
+            return []
+        async with session_factory() as session:
+            query = (
+                select(User)
+                .filter(User.id.in_(user_ids))
+            )
+            res = await session.execute(query)
+            users = res.scalars().all()
+            return users
             
     @staticmethod
     async def get_all() -> list[User]:
