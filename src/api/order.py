@@ -1,6 +1,5 @@
 from typing import Annotated, Any, Dict, List
 from fastapi import APIRouter, Depends
-
 from src.domain.order.repository import OrderRepository, Order
 from src.domain.user.repository import UserRepository
 from src.domain.user__order.repository import UserOrderRepository
@@ -10,6 +9,7 @@ from src.domain.user__order.model import UserOrder
 from src.domain.order.schema import OrderSchema
 from src.domain.user__order.schema import UserOrderSchema
 from src.api.schemas import ResponseSchema
+
 
 order_router = APIRouter(
     prefix="/Orders",
@@ -26,7 +26,7 @@ async def get_all(
                         name=order.name,
                         total_amount=order.total_amount,
                         status = order.status,
-                        description = order.description,                    
+                        description = order.description,                                       
                 ) for order in orders]
  
 @order_router.get("/{id}", summary="Получить заказ по id из БД")
