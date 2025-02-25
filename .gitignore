@@ -16,7 +16,3 @@ coverage.xml
 
 config.py
 src/domain/user/repository_test.py
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes

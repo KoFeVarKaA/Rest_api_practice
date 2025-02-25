@@ -8,7 +8,7 @@ user_router = APIRouter(
     tags=["Users"],
 )
 
-@user_router.get("/", summary="Получить все пользователей из БД")
+@user_router.get("/", summary="Получить всех пользователей из БД")
 async def get_all(
     repository : Annotated[UserRepository, Depends(UserRepository)]
 ) -> List[UserSchema]:
@@ -20,7 +20,7 @@ async def get_all(
                         age=user.age,                   
                 ) for user in users]
  
-@user_router.get("/{id}", summary="Получить пользователя по имени из БД")
+@user_router.get("/{id}", summary="Получить пользователя по id из БД")
 async def get_by_id(
     id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
@@ -39,8 +39,6 @@ async def create_user(
     repository: Annotated[UserRepository, Depends(UserRepository)]
     ) -> Dict[str, Any]:
     await repository.insert(User(
-
-
             first_name=new_user.first_name,
             last_name=new_user.last_name,
             age=new_user.age,
