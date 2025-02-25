@@ -25,9 +25,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.add_column('order', sa.Column('total_sum', sa.NUMERIC(precision=10, scale=2), autoincrement=False, nullable=False))
     op.drop_column('order', 'description')
     op.drop_column('order', 'status')
     op.drop_column('order', 'total_amount')
-    # op.execute("""""")
-    # Добавить Enum в downgrade
+    op.execute("DROP TYPE statusenum;") 
+    op.add_column('order', sa.Column('total_sum', sa.NUMERIC(precision=10, scale=2), autoincrement=False, nullable=False))
+
