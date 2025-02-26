@@ -39,8 +39,7 @@ class OrderRepository:
     async def get_orders_by_user_id(user_id: int) -> list[int]:
         async with session_factory() as session:
             stmt = select(Order).join(UserOrder, UserOrder.order_id == Order.id).where(UserOrder.user_id == user_id)
-            res = (await session.scalars(stmt)).all()
-            return res
+            return (await session.scalars(stmt)).all()
             
     @staticmethod
     async def get_all() -> list[Order]:

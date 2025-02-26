@@ -23,21 +23,9 @@ class UserRepository:
 
     @staticmethod
     async def does_user_exist(user_id) -> bool:
-        # async with session_factory() as session:
-        #     query = (
-        #         select(User)
-        #         .filter(User.id == user_id)
-        #     )
-        #     res = session.execute(query)
-        #     result = res.all()
-        #     if result == []:
-        #         return False
-        #     else:
-        #         return True
         async with session_factory() as session:
             stmt = select(User).where(User.id == user_id)
-            res = (await session.scalars(stmt)).one_or_none()
-            return res
+            return (await session.scalars(stmt)).one_or_none()
 
     @staticmethod
     async def get_id(user_id : int) -> User: 
