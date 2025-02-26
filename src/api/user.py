@@ -32,6 +32,19 @@ async def get_by_id(
                         last_name=user.last_name,
                         age=user.age,                   
                     )
+
+@user_router.get("/user_order/{order_id}", summary="Поиск всех пользователей по введенному id заказа")
+async def get_users_by_order_id(
+    order_id: int,
+    repository: Annotated[UserRepository, Depends(UserRepository)]
+) -> List[UserSchema]: 
+    users = await repository.get_users_by_order_id(order_id) 
+    return [UserSchema(
+                    id=user.id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    age=user.age,
+                ) for user in users]
     
 @user_router.post("", summary="Добавить нового пользователя в БД")
 async def create_user(

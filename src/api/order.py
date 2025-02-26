@@ -2,8 +2,8 @@ from typing import Annotated, Any, Dict, List
 from fastapi import APIRouter, Depends
 from src.domain.order.repository import OrderRepository, Order
 from src.domain.user.repository import UserRepository
-from src.domain.user__order.repository import UserOrderRepository
 
+from src.domain.user.model import User
 from src.domain.user__order.model import UserOrder
 
 from src.domain.order.schema import OrderSchema
@@ -42,19 +42,30 @@ async def get_by_id(
                         status = order.status,
                         description = order.description,                  
                     )
+
+@order_router.get("/user_order/{user_id}", summary="Поиск всех заказов по введенному id пользователя")
+async def get_orders_by_user_id(
+    user_id: int,
+    repository: Annotated[OrderRepository, Depends(OrderRepository)],
+) -> List[OrderSchema]:
+    orders = await repository.get_orders_by_user_id(user_id)
+    return [OrderSchema(
+                        id=order.id,
+                        name=order.name,
+                        total_amount=order.total_amount,
+                        status=order.status,
+                        description=order.description,
+                ) for order in orders]
     
 @order_router.post("", summary="Добавить новый заказ в БД")
 async def create_order(
     user_id: int,
     new_order: OrderSchema,
-    user__order : UserOrderSchema,
     repository: Annotated[OrderRepository, Depends(OrderRepository)],
     repository_user: Annotated[UserRepository, Depends(UserRepository)],
-    repository_user__order: Annotated[UserOrderRepository, Depends(UserOrderRepository)],
     ) -> ResponseSchema:
-    if repository_user.does_user_exist(user_id) == False:
-        return ResponseSchema(code=404, message="Ошибка: пользователь не найден")
-    else:
+    user = await repository_user.does_user_exist(user_id)
+    if isinstance(user, User):
         order = Order(
                 name=new_order.name,
                 total_amount=new_order.total_amount,
@@ -65,11 +76,12 @@ async def create_order(
 
         new_order_id = order.id
 
-        await repository_user__order.insert(UserOrder(
+        await repository.create_order_with_user(UserOrder(
                 user_id=user_id,
                 order_id=new_order_id,
         ))
-        return ResponseSchema(code=200, message="Заказ успешно добавлен")
+        return ResponseSchema(code=200, message="Заказ успешно добавлен")   
+    return ResponseSchema(code=404, message="Ошибка: пользователь не найден")
 
 @order_router.delete("/{id}", summary="Удалить заказ из БД")
 async def delete_order(
