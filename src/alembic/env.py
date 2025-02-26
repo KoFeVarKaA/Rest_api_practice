@@ -8,6 +8,8 @@ from alembic import context
 from config import settings
 from src.domain.user.model import User
 from src.domain.order.model import Order
+from src.domain.user__order.model import UserOrder
+
 from database import Base
 
 config = context.config

@@ -16,4 +16,3 @@ coverage.xml
 
 config.py
 src/domain/user/repository_test.py
-src/domain/user__order
