@@ -12,7 +12,7 @@ from src.api.schemas import ResponseSchema
 
 
 order_router = APIRouter(
-    prefix="/Orders",
+    prefix="/orders",
     tags=["Orders"],
 )
 
@@ -29,7 +29,7 @@ async def get_all(
                         description = order.description,                                       
                 ) for order in orders]
  
-@order_router.get("/{id}", summary="Получить заказ по id из БД")
+@order_router.get("/get_by_id/{id}", summary="Получить заказ по id из БД")
 async def get_by_id(
     id: int,
     repository : Annotated[OrderRepository, Depends(OrderRepository)]

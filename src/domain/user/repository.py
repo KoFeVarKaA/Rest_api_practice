@@ -1,7 +1,9 @@
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from src.domain.user.model import User
 from src.domain.user__order.model import UserOrder
+from src.domain.profession.model import Profession, ProfessionEnum
 from src.domain.user.schema import UserSchema
 from database import async_engine, session_factory
 
@@ -44,7 +46,16 @@ class UserRepository:
         async with session_factory() as session:
             stmt = select(User).join(UserOrder, UserOrder.user_id == User.id).where(UserOrder.order_id == order_id)
             return (await session.scalars(stmt)).all()
-    
+        
+    @staticmethod
+    async def get_users_by_profession_name(name: ProfessionEnum) -> list[User]: 
+        async with session_factory() as session:            
+            stmt = (select(User)
+                    .join(Profession, User.profession_id == Profession.id)
+                    .where(Profession.name == name))
+            result = (await session.scalars(stmt)).all()
+            return result
+        
     @staticmethod
     async def get_all() -> list[User]:
         async with session_factory() as session:
@@ -54,8 +65,8 @@ class UserRepository:
             return users
 
     @staticmethod
-    async def update(user_id : int, new_username : str) -> None:
+    async def update_profession(user_id : int, profession_id : str) -> None:
         async with session_factory() as session:
             user = await session.get(User, user_id)
-            user.username = new_username
+            user.profession_id = profession_id
             await session.commit()
