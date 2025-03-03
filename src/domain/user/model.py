@@ -3,9 +3,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
-
-# if TYPE_CHECKING:
-#     from src.domain.profession.model import Profession
+from src.domain.profession.model import Profession
 
 
 class User(Base):

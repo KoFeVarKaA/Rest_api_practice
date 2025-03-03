@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Dict, List
+from typing import Annotated
 from fastapi import APIRouter, Depends
 from src.domain.order.repository import OrderRepository, Order
 from src.domain.user.repository import UserRepository
@@ -19,7 +19,7 @@ order_router = APIRouter(
 @order_router.get("/", summary="Получить все заказы из БД")
 async def get_all(
     repository : Annotated[OrderRepository, Depends(OrderRepository)]
-) -> List[OrderSchema]:
+) -> list[OrderSchema]:
     orders = await repository.get_all()
     return [OrderSchema(
                         id=order.id,
@@ -47,7 +47,7 @@ async def get_by_id(
 async def get_orders_by_user_id(
     user_id: int,
     repository: Annotated[OrderRepository, Depends(OrderRepository)],
-) -> List[OrderSchema]:
+) -> list[OrderSchema]:
     orders = await repository.get_orders_by_user_id(user_id)
     return [OrderSchema(
                         id=order.id,

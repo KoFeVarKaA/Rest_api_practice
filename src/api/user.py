@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Dict, List
+from typing import Annotated, Any
 from fastapi import APIRouter, Depends
 from src.domain.profession.model import Profession, ProfessionEnum
 from src.domain.profession.repository import ProfessionRepository
@@ -14,7 +14,7 @@ user_router = APIRouter(
 @user_router.get("/", summary="Получить всех пользователей из БД")
 async def get_all(
     repository : Annotated[UserRepository, Depends(UserRepository)]
-) -> List[UserSchema]:
+) -> list[UserSchema]:
     users = await repository.get_all()
     return [UserSchema(
                         id=user.id,
@@ -42,7 +42,7 @@ async def get_by_id(
 async def get_users_by_profession_name(
     profession: ProfessionEnum,
     repository_user: Annotated[UserRepository, Depends(UserRepository)],
-) -> List[UserSchema]:
+) -> list[UserSchema]:
     users = await repository_user.get_users_by_profession_name(profession) 
     return [UserSchema(
                     id=user.id,
@@ -56,7 +56,7 @@ async def get_users_by_profession_name(
 async def get_users_by_order_id(
     order_id: int,
     repository: Annotated[UserRepository, Depends(UserRepository)]
-) -> List[UserSchema]: 
+) -> list[UserSchema]: 
     users = await repository.get_users_by_order_id(order_id) 
     return [UserSchema(
                     id=user.id,
@@ -70,7 +70,7 @@ async def get_users_by_order_id(
 async def create_user(
     new_user: UserSchema,
     repository: Annotated[UserRepository, Depends(UserRepository)]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
     await repository.insert(User(
             first_name=new_user.first_name,
             last_name=new_user.last_name,
@@ -96,6 +96,6 @@ async def appropriate_profession(
 async def delete_user(
     id: int,
     repository : Annotated[UserRepository, Depends(UserRepository)]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
     await repository.del_one(id)
     return {"message": "Пользователь успешно удален"}
