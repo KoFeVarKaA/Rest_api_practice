@@ -12,6 +12,6 @@ class UserOrder(Base):
     id : Mapped[int] = mapped_column(primary_key=True)
     user_id : Mapped[int] = mapped_column(ForeignKey('user.id'))
     order_id : Mapped[int] = mapped_column(ForeignKey('order.id'))
-  
-    # category: Mapped['User'] = relationship(back_populates='id')
-    # category: Mapped['Order'] = relationship(back_populates='id')
+    
+    
+    
