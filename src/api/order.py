@@ -46,17 +46,23 @@ async def get_by_id(
 @order_router.get("/user_order/{user_id}", summary="Поиск всех заказов по введенному id пользователя")
 async def get_orders_by_user_id(
     user_id: int,
-    repository: Annotated[OrderRepository, Depends(OrderRepository)],
-) -> list[OrderSchema]:
-    orders = await repository.get_orders_by_user_id(user_id)
-    return [OrderSchema(
-                        id=order.id,
-                        name=order.name,
-                        total_amount=order.total_amount,
-                        status=order.status,
-                        description=order.description,
-                ) for order in orders]
-    
+    repository_user: Annotated[UserRepository, Depends(UserRepository)],
+    repository_order: Annotated[OrderRepository, Depends(OrderRepository)]
+):
+    user = await repository_user.get_id(user_id)
+    if isinstance(user, User):
+        orders = await repository_order.get_orders_by_user_id(user_id)
+        if orders.orders == []:
+            return ResponseSchema(code=404, message="Нет закрепленных заказов по данному пользователю")
+        return [OrderSchema(
+                            id=order.id,
+                            name=order.name,
+                            total_amount=order.total_amount,
+                            status=order.status,
+                            description=order.description,
+                    ) for order in orders.orders]
+    return ResponseSchema(code=404, message="Ошибка: пользователь не найден")
+
 @order_router.post("", summary="Добавить новый заказ в БД")
 async def create_order(
     user_id: int,

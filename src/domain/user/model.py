@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 from src.domain.profession.model import Profession
+# from src.domain.order.model import Order
 
 
 class User(Base):
@@ -17,3 +18,4 @@ class User(Base):
     profession_id : Mapped[int | None] = mapped_column(ForeignKey('profession.id'))
 
     profession: Mapped["Profession | None"] = relationship(back_populates="users")
+    orders: Mapped[list["Order"]] = relationship(secondary="user__order", back_populates="users")

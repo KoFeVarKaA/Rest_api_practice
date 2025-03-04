@@ -2,6 +2,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends
 from src.domain.profession.model import Profession, ProfessionEnum
 from src.domain.profession.repository import ProfessionRepository
+from src.domain.order.repository import OrderRepository, Order
 from src.domain.user.repository import UserRepository, User
 from src.domain.user.schema import UserSchema
 from src.api.schemas import ResponseSchema
@@ -55,16 +56,22 @@ async def get_users_by_profession_name(
 @user_router.get("/user_order/{order_id}", summary="Поиск всех пользователей по введенному id заказа")
 async def get_users_by_order_id(
     order_id: int,
-    repository: Annotated[UserRepository, Depends(UserRepository)]
-) -> list[UserSchema]: 
-    users = await repository.get_users_by_order_id(order_id) 
-    return [UserSchema(
-                    id=user.id,
-                    first_name=user.first_name,
-                    last_name=user.last_name,
-                    age=user.age,
-                    profession_id=user.profession_id
-                ) for user in users]
+    repository_user: Annotated[UserRepository, Depends(UserRepository)],
+    repository_order: Annotated[OrderRepository, Depends(OrderRepository)]
+    ): 
+    order = await repository_order.get_id(order_id)
+    if isinstance(order, Order):
+        users = await repository_user.get_users_by_order_id(order_id) 
+        if users.users == []:
+            return ResponseSchema(code=404, message="Нет закрепленных пользователей по текущему заказу")
+        return [UserSchema(
+                        id=user.id,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        age=user.age,
+                        profession_id=user.profession_id
+                    ) for user in users.users]
+    return ResponseSchema(code=404, message="Ошибка: заказ не найден")
     
 @user_router.post("", summary="Добавить нового пользователя в БД")
 async def create_user(
@@ -85,7 +92,7 @@ async def appropriate_profession(
     repository_user: Annotated[UserRepository, Depends(UserRepository)],
     repository_profession: Annotated[ProfessionRepository, Depends(ProfessionRepository)],
     ) -> ResponseSchema:
-    user = await repository_user.does_user_exist(user_id)
+    user = await repository_user.get_id(user_id)
     if isinstance(user, User):
         profession_id = await repository_profession.profession_to_id(profession)
         await repository_user.update_profession(user_id, profession_id)

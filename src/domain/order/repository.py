@@ -1,5 +1,7 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
+from src.domain.user.model import User
 from src.domain.order.model import Order
 from src.domain.user__order.model import UserOrder
 from src.domain.order.schema import OrderSchema
@@ -31,15 +33,14 @@ class OrderRepository:
     @staticmethod
     async def get_id(order_id : int) -> Order: 
         async with session_factory() as session:
-            order = await session.get(Order, {"id": order_id})
-            return order
-        
+            stmt = select(Order).where(Order.id == order_id)
+            return (await session.scalars(stmt)).one_or_none()        
     
     @staticmethod
     async def get_orders_by_user_id(user_id: int) -> list[int]:
         async with session_factory() as session:
-            stmt = select(Order).join(UserOrder, UserOrder.order_id == Order.id).where(UserOrder.user_id == user_id)
-            return (await session.scalars(stmt)).all()
+            stmt = select(User).where(User.id == user_id).options(selectinload(User.orders))
+            return (await session.scalars(stmt)).one_or_none()
             
     @staticmethod
     async def get_all() -> list[Order]:
