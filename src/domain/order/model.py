@@ -20,3 +20,5 @@ class Order(Base):
     total_amount : Mapped[Numeric] = mapped_column(Numeric(precision=10, scale=2))
     status : Mapped[StatusEnum]
     description : Mapped[str | None]
+
+    users: Mapped[list["User"]] = relationship(secondary="user__order", back_populates="orders")
