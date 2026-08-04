@@ -10,6 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+from sqlalchemy.dialects import postgresql
+
 
 revision: str = 'e7af500ace6b'
 down_revision: Union[str, None] = '84b4bf824da9'
@@ -18,6 +20,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    status_enum = postgresql.ENUM('designed', 'sent', 'delivered', name='statusenum')
+    status_enum.create(op.get_bind(), checkfirst=True)
+
     op.add_column('order', sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=False))
     op.add_column('order', sa.Column('status', sa.Enum('designed', 'sent', 'delivered', name='statusenum'), nullable=False))
     op.add_column('order', sa.Column('description', sa.String(), nullable=True))
@@ -31,3 +36,5 @@ def downgrade() -> None:
     op.execute("DROP TYPE statusenum;") 
     op.add_column('order', sa.Column('total_sum', sa.NUMERIC(precision=10, scale=2), autoincrement=False, nullable=False))
 
+    status_enum = postgresql.ENUM('designed', 'sent', 'delivered', name='statusenum')
+    status_enum.drop(op.get_bind(), checkfirst=True)
