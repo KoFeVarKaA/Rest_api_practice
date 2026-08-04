@@ -10,6 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+from src.domain.profession.model import ProfessionEnum
+
 
 revision: str = 'da7c755d0316'
 down_revision: Union[str, None] = 'e7af500ace6b'
@@ -18,17 +20,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table('profession',
+    profession_table = op.create_table('profession',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.Enum('Frontend_Developer', 'Data_Scientist', 'DevOps_Engineer', 'Backend_Developer', 'Game_Developer', 'Machine_Learning_Engineer', name='professionenum'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
+    profession_data = [
+        {"id": i + 1, "name": item.value} 
+        for i, item in enumerate(ProfessionEnum)
+    ]
+    op.bulk_insert(profession_table, profession_data)
     op.add_column('user', sa.Column('profession_id', sa.Integer(), nullable=True))
-    op.create_foreign_key(None, 'user', 'profession', ['profession_id'], ['id'])
+    op.create_foreign_key('fk_user_profession', 'user', 'profession', ['profession_id'], ['id'])
 
 
 def downgrade() -> None:
-    # Bug
-    # op.drop_constraint(None, 'user', type_='foreignkey')
+    op.drop_constraint('fk_user_profession', 'user', type_='foreignkey')  
     op.drop_column('user', 'profession_id')
     op.drop_table('profession')
+    bind = op.get_bind()
+    if bind.dialect.name == 'postgresql':
+        sa.Enum(name='professionenum').drop(bind, checkfirst=True)
